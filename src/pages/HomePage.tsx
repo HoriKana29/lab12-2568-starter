@@ -9,6 +9,7 @@ import {
   Group,
   Checkbox,
   ActionIcon,
+  useMantineColorScheme
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import { LoremIpsum } from "lorem-ipsum";
@@ -20,6 +21,7 @@ interface Task {
   description: string;
   isDone: boolean;
   dueDate: Date | null;
+  doneDate: Date | null;
 }
 
 export default function HomePage() {
@@ -30,6 +32,7 @@ export default function HomePage() {
       description: "Vite + React + Mantine + TS",
       isDone: false,
       dueDate: new Date(),
+      doneDate: null,
     },
     {
       id: "2",
@@ -37,6 +40,7 @@ export default function HomePage() {
       description: "Finish project for class",
       isDone: false,
       dueDate: new Date(),
+      doneDate: null,
     },
     {
       id: "3",
@@ -44,6 +48,7 @@ export default function HomePage() {
       description: "Push project to GitHub Pages",
       isDone: false,
       dueDate: new Date(),
+      doneDate: null,
     },
   ]);
   const lorem = new LoremIpsum({
@@ -64,6 +69,7 @@ export default function HomePage() {
       description: lorem.generateWords(10),
       isDone: false,
       dueDate: new Date(),
+      doneDate: null,
     };
     setTasks((prev) => [...prev, newTask]);
   };
@@ -76,9 +82,13 @@ export default function HomePage() {
   // Toggle done
   const toggleDoneTask = (taskId: string) => {
     setTasks((prev) =>
-      prev.map((t) => (t.id === taskId ? { ...t, isDone: !t.isDone } : t))
+      prev.map((t) => (t.id === taskId ? { ...t, isDone: !t.isDone,
+            doneDate: !t.isDone ? new Date() : null, } : t))
     );
   };
+
+  const { colorScheme } = useMantineColorScheme();
+  const isDark = colorScheme === 'dark';
 
   return (
     <Container size="sm" py="lg">
@@ -112,31 +122,28 @@ export default function HomePage() {
                     </Text>
                   )}
                   {/* แสดง Date & Time */}
-                  <Text size="xs" c="gray">
-                    Done at:
-                  </Text>
+                  {task.doneDate &&(
+                    <Text c={isDark ? "yellow" : "purple"}>
+                      Done at: {task.doneDate.toLocaleString()}
+                    </Text>
+                  )}
                 </Stack>
                 {/* แสดง Button Done & Button Delete */}
                 <Group>
-                  <Button
-                    style={{
-                      backgroundColor: "#71c32fda",
-                      color: "#dce6e7ff",
-                    }}
-                    variant="light"
-                    size="xs"
-                    onClick={() => toggleDoneTask(task.id)}
-                  >
-                    Done
-                  </Button>
-                  <Button
-                    color="chanadda"
-                    variant="light"
-                    size="xs"
-                    onClick={() => deleteTask(task.id)}
-                  >
-                    Delete
-                  </Button>
+                  <Checkbox
+                    checked={task.isDone}
+                    onChange={() => toggleDoneTask(task.id)}
+                  />
+                  Done
+                  <ActionIcon
+                  variant="gradient"
+                  size="xl"
+                  aria-label="Delete"
+                  gradient={{ from: 'rgba(255, 3, 3, 1)', to: 'orange', deg: 218 }}
+                  onClick={() => deleteTask(task.id)}
+            >
+              <IconTrash stroke={2} />
+            </ActionIcon>
                 </Group>
               </Group>
             </Card>
